@@ -3,6 +3,8 @@ import passport from "passport";
 import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
 import { Strategy as LocalStrategy } from "passport-local";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { NextFunction } from "express";
+import { Request, Response } from "express";
 
 export const local = passport.use(new LocalStrategy(User.authenticate()));
 
@@ -43,4 +45,4 @@ passport.use(new JwtStrategy(opts, (jwtPayload: MyJwtPayload, done) => {
     })
 }));
 
-export const verifyUser=passport.authenticate('local',{session:false});
+export const verifyUser = passport.authenticate('local', { session: false });

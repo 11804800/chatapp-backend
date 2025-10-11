@@ -10,6 +10,7 @@ import UserRouter from './Routes/UserRoutes';
 import passport from 'passport';
 import { Server } from 'socket.io';
 import http from 'http';
+import StatusRouter from './Routes/StatusRoutes';
 
 
 
@@ -31,8 +32,8 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket: any) => {
-    console.log("new connection",socket.id);
-    socket.emit("welcome","Welcome to the server");
+    console.log("new connection", socket.id);
+    socket.emit("welcome", "Welcome to the server");
 });
 
 
@@ -58,9 +59,6 @@ if (Secret_key) {
 }
 
 
-
-
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, '../public')));
@@ -72,6 +70,7 @@ app.use(cors(corsWithOptions));
 
 
 app.use("/api/users", UserRouter);
+app.use("/api/status", StatusRouter);
 
 app.get("/", (req: Request, res: Response) => {
     res.render('index')
