@@ -11,6 +11,7 @@ import passport from 'passport';
 import { Server } from 'socket.io';
 import http from 'http';
 import StatusRouter from './Routes/StatusRoutes';
+import MessageRouter from './Routes/MessageRouter';
 
 
 
@@ -71,6 +72,7 @@ app.use(cors(corsWithOptions));
 
 app.use("/api/users", UserRouter);
 app.use("/api/status", StatusRouter);
+app.use("/api/messages", MessageRouter);
 
 app.get("/", (req: Request, res: Response) => {
     res.render('index')

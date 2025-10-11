@@ -3,13 +3,16 @@ import passportLocalMongoose from "passport-local-mongoose"
 
 
 const User = new Schema({
+    image: {
+        type: String
+    },
     firstname: {
         type: String,
     },
     lastname: {
         type: String
     },
-    conact: [
+    contact: [
 
     ]
 }, {
