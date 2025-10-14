@@ -1,48 +1,45 @@
-import User from "../Model/User";
 import passport from "passport";
-import { ExtractJwt, Strategy as JwtStrategy, StrategyOptions } from "passport-jwt";
-import { Strategy as LocalStrategy } from "passport-local";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { NextFunction } from "express";
-import { Request, Response } from "express";
+import User from "../Model/User";
+import { Strategy as JwtStrategy, ExtractJwt, StrategyOptions } from 'passport-jwt';
+import { Strategy as LocalStrategy } from 'passport-local';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-export const local = passport.use(new LocalStrategy(User.authenticate()));
-
-const SecretKey: string | undefined = process.env.SECRET_KEY;
-
-if (!SecretKey) {
+const secretKey: string | undefined = process.env.SECRET_KEY;
+if (!secretKey) {
     throw new Error('SECRET_KEY environment variable is not set');
 }
+
+export const local = passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+export const getToken = (user: object): string => {
+    return jwt.sign(user, secretKey, { expiresIn: '1d' });
+};
 
-export const getToken = ((user: object): string => {
-    return jwt.sign(user, SecretKey, { expiresIn: "3600" })
-});
-
-let opts: StrategyOptions = {
+const opts: StrategyOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: SecretKey
+    secretOrKey: secretKey,
 };
 
 interface MyJwtPayload extends JwtPayload {
     _id: string;
 }
 
-passport.use(new JwtStrategy(opts, (jwtPayload: MyJwtPayload, done) => {
-    User.findOne({ _id: jwtPayload._id }, (err: any, user: any) => {
-        if (err) {
+passport.use(
+    new JwtStrategy(opts, async (jwt_payload: MyJwtPayload, done) => {
+        try {
+            const user = await User.findOne({ _id: jwt_payload._id });
+            if (user) {
+                return done(null, user);
+            } else {
+                return done(null, false);
+            }
+        } catch (err) {
             return done(err, false);
         }
-        else if (user) {
-            return done(null, user)
-        }
-        else {
-            return done(false, null)
-        }
     })
-}));
+);
 
-export const verifyUser = passport.authenticate('local', { session: false });
+export const verifyUser = passport.authenticate('jwt', { session: false });

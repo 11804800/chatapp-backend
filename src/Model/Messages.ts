@@ -5,7 +5,12 @@ interface MessageInterface {
     media: string,
     mediaType: String,
     publisher: string,
-    consumer: string
+    consumer: string,
+    seen: boolean,
+    recived: boolean,
+    recivedTime: string,
+    sent: Boolean,
+    sentTime: string
 }
 
 const Message = new Schema<MessageInterface>({
@@ -25,6 +30,24 @@ const Message = new Schema<MessageInterface>({
     publisher: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user"
+    },
+    seen: {
+        type: Boolean,
+        default: false
+    },
+    recived: {
+        type: Boolean,
+        default: false
+    },
+    recivedTime: {
+        type: String
+    },
+    sent: {
+        type: Boolean,
+        default: false
+    },
+    sentTime: {
+        type: String
     }
 }, {
     timestamps: true

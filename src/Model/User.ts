@@ -1,8 +1,24 @@
-import { Schema, model } from "mongoose";
-import passportLocalMongoose from "passport-local-mongoose"
+import mongoose, { Schema, model } from "mongoose";
+import passportLocalMongoose from 'passport-local-mongoose'
 
 
-const User = new Schema({
+const ContactSchema = new Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user"
+    },
+    lastMessage: {
+        type: String
+    },
+    unseenmessagecount: {
+        type: Number,
+        default: 0
+    }
+}, {
+    timestamps: true
+});
+
+const UserShema = new Schema({
     image: {
         type: String
     },
@@ -12,12 +28,21 @@ const User = new Schema({
     lastname: {
         type: String
     },
-    contact: [
-
-    ]
+    socket_id: {
+        type: String
+    },
+    contact: [ContactSchema],
+    online: {
+        type: Boolean,
+        default: false
+    },
+    descrition: {
+        type: String
+    }
 }, {
     timestamps: true
 });
 
-User.plugin(passportLocalMongoose);
-export default model<any>("user", User);
+UserShema.plugin(passportLocalMongoose);
+const User = model<any>("user", UserShema);
+export default User;

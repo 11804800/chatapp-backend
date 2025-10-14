@@ -12,6 +12,9 @@ import { Server } from 'socket.io';
 import http from 'http';
 import StatusRouter from './Routes/StatusRoutes';
 import MessageRouter from './Routes/MessageRouter';
+import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, UpdateContact, UpdatelastMessage } from './utils/Action';
+import { PostMessage } from './utils/PostMessage';
+
 
 
 
@@ -32,9 +35,42 @@ const io = new Server(server, {
     }
 });
 
+
 io.on("connection", (socket: any) => {
-    console.log("new connection", socket.id);
-    socket.emit("welcome", "Welcome to the server");
+
+    socket.on("connection", (data: any) => {
+        SetSocket({ id: data.id, socket: socket.id });
+    });
+
+    socket.on("send-message", async (data: any) => {
+        const user = await GetUserSocketID(data.consumer);
+        const isUserPresentInContact = await GetContact({ consumer: data.consumer, publisher: data.publisher });
+        const message = await PostMessage(data);
+        if (isUserPresentInContact) {
+            io.to(user?.socket_id).emit("new-message", { data: message });
+            UpdateContact(data);
+        }
+        else {
+            await AddContact({ consumer: data.consumer, publisher: data.publisher });
+            io.to(user?.socket_id).emit("new-message", { data: data });
+        }
+        UpdatelastMessage(data);
+        socket.emit("message-sent", { data: message });
+    });
+
+    socket.on('seen', async (data: any) => {
+        await DeleteMessageCount(data);
+    })
+
+    socket.on("message-seen", async (data: any) => {
+        const user = await GetUserSocketID(data.data);
+        io.to(user?.socket_id).emit("message-seen-ack", { data: data.reciver });
+    });
+
+    socket.on("message-recived", async (data: any) => {
+        socket.broadcast.emit("message-recived-ack", { data: data });
+    });
+
 });
 
 
@@ -55,18 +91,20 @@ if (Secret_key) {
         secret: Secret_key,
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: true }
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24
+        }
     }));
 }
 
 
 app.set('view engine', 'ejs');
+app.use(passport.initialize());
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json())
-app.use(passport.initialize());
 app.use(cors(corsWithOptions));
 
 
