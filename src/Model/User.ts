@@ -38,7 +38,8 @@ const UserShema = new Schema({
     },
     description: {
         type: String
-    }
+    },
+    status: [{ type: mongoose.Schema.Types.ObjectId, ref: "Status" }]
 }, {
     timestamps: true
 });

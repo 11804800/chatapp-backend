@@ -5,7 +5,8 @@ interface Status {
     file: string,
     link: string,
     mediaType: string,
-    user: string
+    user: string,
+    seen: any[]
 }
 
 const StatusSchema = new Schema<Status>({
@@ -24,7 +25,8 @@ const StatusSchema = new Schema<Status>({
     },
     link: {
         type: String
-    }
+    },
+    seen: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }]
 }, {
     timestamps: true
 });
