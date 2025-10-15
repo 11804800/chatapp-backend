@@ -36,7 +36,7 @@ const UserShema = new Schema({
         type: Boolean,
         default: false
     },
-    descrition: {
+    description: {
         type: String
     }
 }, {

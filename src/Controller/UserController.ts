@@ -160,8 +160,21 @@ export const deleteContact = async (req: any, res: Response) => {
 
 export const UpdateUserInfo = async (req: any, res: Response) => {
     try {
-        const data: any = await User.findByIdAndUpdate(req.user?._id, { $set: req.body }, { new: true });
-        res.status(201).json({ data: data })
+        if (req.file) {
+            const data: any = await User.findByIdAndUpdate(req.user?._id, {
+                $set: {
+                    image: `/images/${req.file.filename}`,
+                    firstname: req.body.firstname,
+                    lastname: req.body.lastname,
+                    description: req.body?.description
+                }
+            }, { new: true });
+            res.status(201).json({ data: data })
+        }
+        else {
+            const data: any = await User.findByIdAndUpdate(req.user?._id, { $set: req.body }, { new: true });
+            res.status(201).json({ data: data })
+        }
     }
     catch (err: any) {
         res.status(500).json({ error: err.message });

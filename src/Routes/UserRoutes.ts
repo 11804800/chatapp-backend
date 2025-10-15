@@ -1,7 +1,19 @@
-import express from 'express';
+import express, { Request } from 'express';
 import { AddContact, ChangePasswordController, DeleteAccountController, deleteContact, GetAllUser, GetUserInfo, LoginUserController, RegisterUserController, ResetPasswordController, UpdateUserInfo, UserInfoController } from '../Controller/UserController';
 import { verifyUser } from '../Middleware/Authentication';
-import User from '../Model/User';
+import multer from 'multer';
+import path from 'path';
+
+const storage: any = multer.diskStorage({
+    destination: (req: Request, file: Express.Multer.File, cb: any) => {
+        cb(null, "public/images/");
+    },
+    filename: (req: Request, file: Express.Multer.File, cb: any) => {
+        cb(null, file.originalname + '-' + Date.now() + path.extname(file.originalname))
+    }
+});
+
+const upload: any = multer({ storage: storage });
 
 const UserRouter = express.Router();
 
@@ -15,7 +27,7 @@ UserRouter.post("/change-password", ChangePasswordController);
 
 UserRouter.post("/contact", verifyUser, AddContact);
 UserRouter.delete("/contact", verifyUser, deleteContact);
-UserRouter.put("/", verifyUser, UpdateUserInfo);
+UserRouter.put("/", verifyUser, upload.single("profile-image"), UpdateUserInfo);
 UserRouter.get("/info/:id", verifyUser, GetUserInfo);
 
 
