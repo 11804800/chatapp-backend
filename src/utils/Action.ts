@@ -56,6 +56,21 @@ export const UpdatelastMessage = async (body: any) => {
         const contact: any = data.contact.find((c: any) => c.userId.toString() === body.consumer);
         if (contact) {
             contact.lastMessage = body.message;
+            contact.mediaType = body.mediaType;
+            await data.save();
+        }
+    }
+    catch (err: any) {
+        return err;
+    }
+}
+export const UpdatelastMessage2 = async (body: any) => {
+    try {
+        const data: any = await User.findById(body.consumer);
+        const contact: any = data.contact.find((c: any) => c.userId.toString() === body.publisher);
+        if (contact) {
+            contact.lastMessage = body.message;
+            contact.mediaType = body.mediaType;
             await data.save();
         }
     }

@@ -63,3 +63,20 @@ export const UpdateMessageSeen = async (req: any, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 }
+
+export const PostAudio = async (req: any, res: Response) => {
+    try {
+        const data: any = await Messages.create({
+            media: `/audio/${req.file.filename}`,
+            mediaType: "audio",
+            consumer: req.body.consumer,
+            publisher: req.user?._id,
+            sentTime: new Date(),
+            sent: true
+        });
+        res.status(200).json({ data: data });
+    }
+    catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+}

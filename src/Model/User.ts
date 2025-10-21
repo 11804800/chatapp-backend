@@ -13,6 +13,9 @@ const ContactSchema = new Schema({
     unseenmessagecount: {
         type: Number,
         default: 0
+    },
+    mediaType: {
+        type: String,
     }
 }, {
     timestamps: true

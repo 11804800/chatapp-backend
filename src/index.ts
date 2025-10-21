@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import StatusRouter from './Routes/StatusRoutes';
 import MessageRouter from './Routes/MessageRouter';
-import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, UpdateContact, UpdatelastMessage } from './utils/Action';
+import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, UpdateContact, UpdatelastMessage, UpdatelastMessage2 } from './utils/Action';
 import { PostMessage } from './utils/PostMessage';
 
 
@@ -20,7 +20,7 @@ import { PostMessage } from './utils/PostMessage';
 
 const corsWithOptions = {
     origin: "http://localhost:5173",
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH'],
     credentials: true,
 }
 
@@ -30,7 +30,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:5173",
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH'],
         credentials: true,
     }
 });
@@ -55,12 +55,38 @@ io.on("connection", (socket: any) => {
             io.to(user?.socket_id).emit("new-message", { data: data });
         }
         UpdatelastMessage(data);
+        UpdatelastMessage2(data);
         socket.emit("message-sent", { data: message });
     });
 
     socket.on('seen', async (data: any) => {
         await DeleteMessageCount(data);
     })
+
+    socket.on("media-message", async (data: any) => {
+        const user = await GetUserSocketID(data.data.consumer);
+        const isUserPresentInContact = await GetContact({ consumer: data.data.consumer, publisher: data.publisher });
+        if (isUserPresentInContact) {
+            io.to(user?.socket_id).emit("new-message", { data: data.data });
+            UpdateContact(data);
+        }
+        else {
+            await AddContact({ consumer: data.consumer, publisher: data.data.publisher });
+            io.to(user?.socket_id).emit("new-message", { data: data.data });
+        }
+        UpdatelastMessage({
+            mediaType: data.data.mediaType,
+            message: data.data.message,
+            publisher: data.data.publisher,
+            consumer: data.data.consumer
+        });
+        UpdatelastMessage2({
+            mediaType: data.data.mediaType,
+            message: data.data.message,
+            publisher: data.data.publisher,
+            consumer: data.data.consumer
+        });
+    });
 
     socket.on("message-seen", async (data: any) => {
         const user = await GetUserSocketID(data.data);
@@ -97,17 +123,16 @@ if (Secret_key) {
     }));
 }
 
-
+app.use(cors(corsWithOptions));
 app.set('view engine', 'ejs');
 app.use(passport.initialize());
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.json())
-app.use(cors(corsWithOptions));
+app.use(express.json());
 
-
+app.use('/audio', express.static(path.join(__dirname, 'public', 'audio')));
 app.use("/api/users", UserRouter);
 app.use("/api/status", StatusRouter);
 app.use("/api/messages", MessageRouter);
