@@ -26,7 +26,7 @@ UserRouter.post("/reset-password", ResetPasswordController);
 UserRouter.post("/change-password", ChangePasswordController);
 
 UserRouter.post("/contact", verifyUser, AddContact);
-UserRouter.delete("/contact", verifyUser, deleteContact);
+UserRouter.delete("/contact/:contact", verifyUser, deleteContact);
 UserRouter.put("/", verifyUser, upload.single("profile-image"), UpdateUserInfo);
 UserRouter.get("/info/:id", verifyUser, GetUserInfo);
 

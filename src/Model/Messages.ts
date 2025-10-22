@@ -10,7 +10,8 @@ interface MessageInterface {
     recived: boolean,
     recivedTime: string,
     sent: Boolean,
-    sentTime: string
+    sentTime: string,
+    hiddenId: []
 }
 
 const Message = new Schema<MessageInterface>({
@@ -48,7 +49,8 @@ const Message = new Schema<MessageInterface>({
     },
     sentTime: {
         type: String
-    }
+    },
+    hiddenId: []
 }, {
     timestamps: true
 });

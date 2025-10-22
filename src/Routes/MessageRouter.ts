@@ -1,8 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
 import {
+    ClearChat,
     DeleteMessage,
     GetMessage,
+    HideMessage,
     PostAudio,
     UpdateMessage,
     UpdateMessages,
@@ -26,10 +28,13 @@ const Storage: StorageEngine = multer.diskStorage({
 const uploadMedia: any = multer({ storage: Storage });
 
 MessageRouter.get("/", verifyUser, GetMessage);
+MessageRouter.put("/hide", verifyUser, HideMessage);
+MessageRouter.put("/clear-chat", verifyUser, ClearChat);
+MessageRouter.put("/", verifyUser, UpdateMessages);
 MessageRouter.put("/:id", verifyUser, UpdateMessage);
 MessageRouter.delete("/:id", verifyUser, DeleteMessage);
-MessageRouter.put("/", verifyUser, UpdateMessages);
 MessageRouter.put("/publisher/seen", verifyUser, UpdateMessageSeen);
 MessageRouter.post("/media", verifyUser, uploadMedia.single("audio"), PostAudio);
+
 
 export default MessageRouter;

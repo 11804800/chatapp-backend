@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import passport from "passport";
 import User from "../Model/User";
 import { getToken } from "../Middleware/Authentication";
+import Messages from "../Model/Messages";
 
 export const RegisterUserController = ((req: Request, res: Response) => {
     User.register(new User({
@@ -145,10 +146,22 @@ export const AddContact = async (req: any, res: Response) => {
 
 export const deleteContact = async (req: any, res: Response) => {
     try {
-        const { contact } = req.body;
+
+        const { contact } = req.params;
         const data: any = await User.findByIdAndUpdate(req.user?._id);
         data.contact = data.contact.filter((item: any) => item.userId != contact);
         await data.save();
+
+        await Messages.updateMany(
+            {
+                $or: [
+                    { publisher: req.user?._id, consumer: contact },
+                    { publisher: contact, consumer: req.user?._id }
+                ]
+            }, {
+            $push: { hiddenId: req.user?._id }
+        });
+
         res.status(201).json({ data: data })
     }
     catch (err: any) {

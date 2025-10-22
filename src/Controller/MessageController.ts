@@ -3,7 +3,13 @@ import Messages from "../Model/Messages";
 
 export const GetMessage = async (req: any, res: Response) => {
     try {
-        const data = await Messages.find({ $or: [{ publisher: req.user?._id }, { consumer: req.user?._id }] })
+        const data = await Messages.find({
+            $or: [
+                { publisher: req.user?._id },
+                { consumer: req.user?._id }
+            ],
+            hiddenId: { $nin: [req.user?._id] }
+        });
         res.status(200).json({ data: data, user: req.user });
     }
     catch (error: any) {
@@ -78,5 +84,38 @@ export const PostAudio = async (req: any, res: Response) => {
     }
     catch (error: any) {
         res.status(500).json({ error: error.message });
+    }
+}
+
+export const HideMessage = async (req: any, res: Response) => {
+    try {
+        await Messages.updateMany({
+            _id: { $in: req.body.idArray }
+        }, {
+            $push: { hiddenId: req.user?._id }
+        })
+        res.status(200).json({ reciever: req.user?._id });
+    }
+    catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
+export const ClearChat = async (req: any, res: Response) => {
+    try {
+        const { contact } = req.body;
+        await Messages.updateMany(
+            {
+                $or: [
+                    { publisher: req.user?._id, consumer: contact },
+                    { publisher: contact, consumer: req.user?._id }
+                ]
+            }, {
+            $push: { hiddenId: req.user?._id }
+        });
+        res.status(200).json({ reciever: req.user?._id });
+    }
+    catch (err: any) {
+
     }
 }
