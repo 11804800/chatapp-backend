@@ -8,7 +8,10 @@ export const PostMessage = async (body: any) => {
             consumer: body?.consumer,
             publisher: body.publisher,
             sent: true,
-            sentTime: new Date()
+            sentTime: new Date(),
+            reply: body?.reply,
+            forward: body?.forward,
+            mediaDuration: body?.mediaDuration
         });
         return data;
     }

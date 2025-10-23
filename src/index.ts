@@ -77,12 +77,14 @@ io.on("connection", (socket: any) => {
         UpdatelastMessage({
             mediaType: data.data.mediaType,
             message: data.data.message,
+            mediaDuration: data.data.mediaDuration,
             publisher: data.data.publisher,
             consumer: data.data.consumer
         });
         UpdatelastMessage2({
             mediaType: data.data.mediaType,
             message: data.data.message,
+            mediaDuration: data.data.mediaDuration,
             publisher: data.data.publisher,
             consumer: data.data.consumer
         });

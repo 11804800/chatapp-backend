@@ -63,7 +63,7 @@ export const UserInfoController = async (req: any, res: Response) => {
     try {
         const data: any = await User.findById(req.user?._id).populate({
             path: "contact.userId",
-            select: "firstname lastname image socket_id"
+            select: "firstname lastname image socket_id description online"
         });
         res.status(200).json({ data: data })
     }
@@ -163,6 +163,34 @@ export const deleteContact = async (req: any, res: Response) => {
         });
 
         res.status(201).json({ data: data })
+    }
+    catch (err: any) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+export const deleteContacts = async (req: any, res: Response) => {
+    try {
+
+        const { contacts } = req.body;
+        const data: any = await User.findById(req.user?._id);
+        const filteredData = data.contact.filter((item: any) => !contacts.includes(item.userId.toString()));
+        data.contact = filteredData;
+        await data.save();
+
+        contacts.map(async (item: any) => {
+            await Messages.updateMany(
+                {
+                    $or: [
+                        { publisher: req.user?._id, consumer: item },
+                        { publisher: item, consumer: req.user?._id }
+                    ]
+                }, {
+                $push: { hiddenId: req.user?._id }
+            });
+        })
+
+        res.status(201).json({ data: data.contact, contacts: filteredData })
     }
     catch (err: any) {
         res.status(500).json({ error: err.message });

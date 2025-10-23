@@ -16,6 +16,12 @@ const ContactSchema = new Schema({
     },
     mediaType: {
         type: String,
+    },
+    lastMessageTime: {
+        type: Date
+    },
+    mediaDuration: {
+        type: String
     }
 }, {
     timestamps: true

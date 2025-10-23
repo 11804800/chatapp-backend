@@ -1,5 +1,5 @@
 import express, { Request } from 'express';
-import { AddContact, ChangePasswordController, DeleteAccountController, deleteContact, GetAllUser, GetUserInfo, LoginUserController, RegisterUserController, ResetPasswordController, UpdateUserInfo, UserInfoController } from '../Controller/UserController';
+import { AddContact, ChangePasswordController, DeleteAccountController, deleteContact, deleteContacts, GetAllUser, GetUserInfo, LoginUserController, RegisterUserController, ResetPasswordController, UpdateUserInfo, UserInfoController } from '../Controller/UserController';
 import { verifyUser } from '../Middleware/Authentication';
 import multer from 'multer';
 import path from 'path';
@@ -26,6 +26,7 @@ UserRouter.post("/reset-password", ResetPasswordController);
 UserRouter.post("/change-password", ChangePasswordController);
 
 UserRouter.post("/contact", verifyUser, AddContact);
+UserRouter.put("/contact", verifyUser, deleteContacts);
 UserRouter.delete("/contact/:contact", verifyUser, deleteContact);
 UserRouter.put("/", verifyUser, upload.single("profile-image"), UpdateUserInfo);
 UserRouter.get("/info/:id", verifyUser, GetUserInfo);

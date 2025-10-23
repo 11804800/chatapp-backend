@@ -9,6 +9,9 @@ export const GetMessage = async (req: any, res: Response) => {
                 { consumer: req.user?._id }
             ],
             hiddenId: { $nin: [req.user?._id] }
+        }).populate({
+            path: "reply",
+            select: "message media mediaType mediaDuration"
         });
         res.status(200).json({ data: data, user: req.user });
     }
@@ -78,7 +81,8 @@ export const PostAudio = async (req: any, res: Response) => {
             consumer: req.body.consumer,
             publisher: req.user?._id,
             sentTime: new Date(),
-            sent: true
+            sent: true,
+            mediaDuration: req.body.mediaDuration
         });
         res.status(200).json({ data: data });
     }

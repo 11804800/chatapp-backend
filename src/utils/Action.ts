@@ -57,6 +57,8 @@ export const UpdatelastMessage = async (body: any) => {
         if (contact) {
             contact.lastMessage = body.message;
             contact.mediaType = body.mediaType;
+            contact.lastMessageTime = new Date();
+            contact.mediaDuration = body.mediaDuration;
             await data.save();
         }
     }
@@ -71,6 +73,8 @@ export const UpdatelastMessage2 = async (body: any) => {
         if (contact) {
             contact.lastMessage = body.message;
             contact.mediaType = body.mediaType;
+            contact.lastMessageTime = new Date();
+            contact.mediaDuration = body.mediaDuration;
             await data.save();
         }
     }

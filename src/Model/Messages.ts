@@ -11,7 +11,11 @@ interface MessageInterface {
     recivedTime: string,
     sent: Boolean,
     sentTime: string,
-    hiddenId: []
+    hiddenId: [],
+    forward: boolean,
+    reply: string,
+    reaction: string,
+    mediaDuration: string
 }
 
 const Message = new Schema<MessageInterface>({
@@ -19,6 +23,9 @@ const Message = new Schema<MessageInterface>({
         type: String
     },
     media: {
+        type: String
+    },
+    mediaDuration: {
         type: String
     },
     mediaType: {
@@ -50,7 +57,18 @@ const Message = new Schema<MessageInterface>({
     sentTime: {
         type: String
     },
-    hiddenId: []
+    hiddenId: [],
+    forward: {
+        type: Boolean,
+        default: false
+    },
+    reply: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "messages"
+    },
+    reaction: {
+        type: String
+    }
 }, {
     timestamps: true
 });
