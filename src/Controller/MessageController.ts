@@ -120,6 +120,26 @@ export const ClearChat = async (req: any, res: Response) => {
         res.status(200).json({ reciever: req.user?._id });
     }
     catch (err: any) {
+        res.status(500).json({ err: err.message });
+    }
+}
 
+
+export const PostMediaMessage = async (req: any, res: Response) => {
+    try {
+        const data: any = await Messages.create({
+            media: `${req.file.filename}`,
+            mediaType: req.body.mediaType,
+            consumer: req.body.consumer,
+            publisher: req.user?._id,
+            message: req.body.message,
+            sentTime: new Date(),
+            sent: true,
+            mediaDuration: req.body.mediaDuration
+        });
+        res.status(200).json({ data: data });
+    }
+    catch (err: any) {
+        res.status(500).json({ err: err.message });
     }
 }

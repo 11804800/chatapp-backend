@@ -90,6 +90,33 @@ io.on("connection", (socket: any) => {
         });
     });
 
+    socket.on("send-file-message", async (data: any) => {
+        const user = await GetUserSocketID(data.data.consumer);
+        const isUserPresentInContact = await GetContact({ consumer: data.data.consumer, publisher: data.publisher });
+        if (isUserPresentInContact) {
+            io.to(user?.socket_id).emit("new-message", { data: data.data });
+            UpdateContact(data);
+        }
+        else {
+            await AddContact({ consumer: data.consumer, publisher: data.data.publisher });
+            io.to(user?.socket_id).emit("new-message", { data: data.data });
+        }
+        UpdatelastMessage({
+            mediaType: data.data.mediaType,
+            message: data.data.media,
+            mediaDuration: data.data?.mediaDuration,
+            publisher: data.data.publisher,
+            consumer: data.data.consumer
+        });
+        UpdatelastMessage2({
+            mediaType: data.data.mediaType,
+            message: data.data.media,
+            mediaDuration: data.data?.mediaDuration,
+            publisher: data.data.publisher,
+            consumer: data.data.consumer
+        });
+    });
+
     socket.on("message-seen", async (data: any) => {
         const user = await GetUserSocketID(data.data);
         io.to(user?.socket_id).emit("message-seen-ack", { data: data.reciver });
