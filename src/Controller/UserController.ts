@@ -63,7 +63,7 @@ export const UserInfoController = async (req: any, res: Response) => {
     try {
         const data: any = await User.findById(req.user?._id).populate({
             path: "contact.userId",
-            select: "firstname lastname image socket_id description online"
+            select: "firstname lastname image socket_id description online onlineTime"
         });
         res.status(200).json({ data: data })
     }

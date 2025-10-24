@@ -5,7 +5,17 @@ import User from "../Model/User";
 export const SetSocket = async (body: any) => {
     try {
         const { socket, id } = body;
-        await User.findByIdAndUpdate(id, { $set: { socket_id: socket } }, { new: true });
+        await User.findByIdAndUpdate(id, { $set: { socket_id: socket, online: true, onlineTime: new Date() } }, { new: true });
+    }
+    catch (err: any) {
+        console.log(err)
+    }
+}
+
+export const SetUserOffline = async ({ socketId }: any) => {
+    try {
+        const data = await User.findOneAndUpdate({ socket_id: socketId }, { $set: { online: false, onlineTime: new Date() } }, { new: true });
+        return data;
     }
     catch (err: any) {
         console.log(err)

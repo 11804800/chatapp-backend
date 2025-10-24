@@ -38,12 +38,16 @@ const UserShema = new Schema({
         type: String
     },
     socket_id: {
-        type: String
+        type: String,
+        unique: true
     },
     contact: [ContactSchema],
     online: {
         type: Boolean,
         default: false
+    },
+    onlineTime: {
+        type: String
     },
     description: {
         type: String

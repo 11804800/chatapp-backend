@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import StatusRouter from './Routes/StatusRoutes';
 import MessageRouter from './Routes/MessageRouter';
-import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, UpdateContact, UpdatelastMessage, UpdatelastMessage2 } from './utils/Action';
+import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, SetUserOffline, UpdateContact, UpdatelastMessage, UpdatelastMessage2 } from './utils/Action';
 import { PostMessage } from './utils/PostMessage';
 
 
@@ -40,7 +40,9 @@ io.on("connection", (socket: any) => {
 
     socket.on("connection", (data: any) => {
         SetSocket({ id: data.id, socket: socket.id });
+        socket.broadcast.emit("user-online", { data: data?.id });
     });
+
 
     socket.on("send-message", async (data: any) => {
         const user = await GetUserSocketID(data.consumer);
@@ -124,6 +126,13 @@ io.on("connection", (socket: any) => {
 
     socket.on("message-recived", async (data: any) => {
         socket.broadcast.emit("message-recived-ack", { data: data });
+    });
+
+    socket.on("disconnect", async () => {
+        const data: any = await SetUserOffline({ socketId: socket.id });
+        if (data) {
+            socket.broadcast.emit("user-offline", { data: data?._id });
+        }
     });
 
 });
