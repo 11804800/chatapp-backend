@@ -11,7 +11,10 @@ export const GetMessage = async (req: any, res: Response) => {
             hiddenId: { $nin: [req.user?._id] }
         }).populate({
             path: "reply",
-            select: "message media mediaType mediaDuration"
+            select: "message media mediaType mediaDuration publisher"
+        }).populate({
+            path: "reply.publisher",
+            select: "firstname lastname username"
         });
         res.status(200).json({ data: data, user: req.user });
     }

@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import StatusRouter from './Routes/StatusRoutes';
 import MessageRouter from './Routes/MessageRouter';
-import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, SetUserOffline, UpdateContact, UpdatelastMessage, UpdatelastMessage2 } from './utils/Action';
+import { AddContact, DeleteMessageCount, GetContact, GetUserSocketID, SetSocket, SetUserOffline, UpdateContact, UpdatelastMessage, UpdatelastMessage2, UpdateMessage } from './utils/Action';
 import { PostMessage } from './utils/PostMessage';
 
 
@@ -24,6 +24,7 @@ const corsWithOptions = {
     credentials: true,
 }
 
+console.log("hello")
 
 const app: any = express();
 const server = http.createServer(app);
@@ -63,7 +64,7 @@ io.on("connection", (socket: any) => {
 
     socket.on('seen', async (data: any) => {
         await DeleteMessageCount(data);
-    })
+    });
 
     socket.on("media-message", async (data: any) => {
         const user = await GetUserSocketID(data.data.consumer);
@@ -117,6 +118,25 @@ io.on("connection", (socket: any) => {
             publisher: data.data.publisher,
             consumer: data.data.consumer
         });
+    });
+
+    socket.on("reaction", async (data: any) => {
+        const { messageId, consumer, reaction, publisher } = data;
+        const MessageData: any = await UpdateMessage({ messageId, reaction });
+        console.log(MessageData);
+        UpdatelastMessage({
+            message: "Reacted to message",
+            publisher: publisher,
+            consumer: consumer
+        });
+        UpdatelastMessage2({
+            message: "Reacted to message",
+            publisher: publisher,
+            consumer: consumer
+        });
+        const user = await GetUserSocketID(consumer);
+        io.to(user?.socket_id).emit("new-message", { data: MessageData });
+        UpdateContact(data);
     });
 
     socket.on("message-seen", async (data: any) => {

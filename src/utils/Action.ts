@@ -1,6 +1,7 @@
 import axios from "axios"
 import { Request, Response } from "express"
 import User from "../Model/User";
+import Messages from "../Model/Messages";
 
 export const SetSocket = async (body: any) => {
     try {
@@ -117,6 +118,20 @@ export const DeleteMessageCount = async (body: any) => {
             contact.unseenmessagecount = 0;
             await data.save();
         }
+    }
+    catch (err: any) {
+        return err;
+    }
+}
+
+export async function UpdateMessage(body: any) {
+    try {
+        const data = await Messages.findByIdAndUpdate(body.messageId, {
+            $set: {
+                reaction: body.reaction
+            }
+        }, { new: true });
+        return data;
     }
     catch (err: any) {
         return err;
