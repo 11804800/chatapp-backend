@@ -24,7 +24,6 @@ const corsWithOptions = {
     credentials: true,
 }
 
-console.log("hello")
 
 const app: any = express();
 const server = http.createServer(app);
@@ -43,6 +42,20 @@ io.on("connection", (socket: any) => {
         SetSocket({ id: data.id, socket: socket.id });
         socket.broadcast.emit("user-online", { data: data?.id });
     });
+
+    socket.on("start-typing", async (data: any) => {
+        const user = await GetUserSocketID(data.consumer);
+        if (user) {
+            io.to(user?.socket_id).emit("user-typing", data);
+        }
+    });
+
+    socket.on("end-typing", async (data: any) => {
+        const user = await GetUserSocketID(data.consumer);
+        if (user) {
+            io.to(user?.socket_id).emit("user-stopped-typing", data);
+        }
+    })
 
 
     socket.on("send-message", async (data: any) => {
@@ -106,14 +119,14 @@ io.on("connection", (socket: any) => {
         }
         UpdatelastMessage({
             mediaType: data.data.mediaType,
-            message: data.data.media,
+            message: data.data.mediaType == "audio" ? "audio" : data.data.media,
             mediaDuration: data.data?.mediaDuration,
             publisher: data.data.publisher,
             consumer: data.data.consumer
         });
         UpdatelastMessage2({
             mediaType: data.data.mediaType,
-            message: data.data.media,
+            message: data.data.mediaType == "audio" ? "audio" : data.data.media,
             mediaDuration: data.data?.mediaDuration,
             publisher: data.data.publisher,
             consumer: data.data.consumer

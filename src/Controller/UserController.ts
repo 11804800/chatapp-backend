@@ -28,9 +28,9 @@ export const RegisterUserController = ((req: Request, res: Response) => {
     })
 });
 
-export const GetAllUser = async (req: Request, res: Response) => {
+export const GetAllUser = async (req: any, res: Response) => {
     try {
-        const data: any = await User.find({});
+        const data: any = await User.find({ _id: { $ne: req.user?._id } });
         res.status(200).json({ data: data });
     }
     catch (error: any) {

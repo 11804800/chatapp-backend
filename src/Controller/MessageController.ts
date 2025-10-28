@@ -12,10 +12,8 @@ export const GetMessage = async (req: any, res: Response) => {
         }).populate({
             path: "reply",
             select: "message media mediaType mediaDuration publisher"
-        }).populate({
-            path: "reply.publisher",
-            select: "firstname lastname username"
         });
+
         res.status(200).json({ data: data, user: req.user });
     }
     catch (error: any) {
@@ -79,7 +77,7 @@ export const UpdateMessageSeen = async (req: any, res: Response) => {
 export const PostAudio = async (req: any, res: Response) => {
     try {
         const data: any = await Messages.create({
-            media: `/audio/${req.file.filename}`,
+            media: req.file.filename,
             mediaType: "audio",
             consumer: req.body.consumer,
             publisher: req.user?._id,
@@ -131,7 +129,7 @@ export const ClearChat = async (req: any, res: Response) => {
 export const PostMediaMessage = async (req: any, res: Response) => {
     try {
         const data: any = await Messages.create({
-            media: `${req.file.filename}`,
+            media: req.file.filename,
             mediaType: req.body.mediaType,
             consumer: req.body.consumer,
             publisher: req.user?._id,

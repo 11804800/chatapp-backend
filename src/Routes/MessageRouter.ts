@@ -21,7 +21,7 @@ MessageRouter.use(bodyParser.json());
 
 const Storage: StorageEngine = multer.diskStorage({
     destination: (req: any, file: Express.Multer.File, cb: any) => {
-        cb(null, "public/audio");
+        cb(null, "public/uploads");
     },
     filename: (req: any, file: Express.Multer.File, cb: any) => {
         cb(null, `${Date.now()}-${file.originalname}.mp3`)
@@ -30,7 +30,7 @@ const Storage: StorageEngine = multer.diskStorage({
 
 const Storage1: StorageEngine = multer.diskStorage({
     destination: (req: any, file: Express.Multer.File, cb: any) => {
-        cb(null, "public");
+        cb(null, "public/uploads");
     },
     filename: (req: any, file: Express.Multer.File, cb: any) => {
         cb(null, file.originalname + path.extname(file.originalname));

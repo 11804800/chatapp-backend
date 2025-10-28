@@ -18,7 +18,7 @@ const upload: any = multer({ storage: storage });
 const UserRouter = express.Router();
 
 UserRouter.get('/', verifyUser, UserInfoController);
-UserRouter.get("/all", GetAllUser);
+UserRouter.get("/all", verifyUser, GetAllUser);
 UserRouter.delete("/", DeleteAccountController);
 UserRouter.post('/register', RegisterUserController);
 UserRouter.post("/login", LoginUserController);
