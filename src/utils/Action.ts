@@ -49,7 +49,7 @@ export const GetContact = async (body: any) => {
 export const AddContact = async (body: any) => {
     try {
         const { consumer, publisher } = body;
-        const data = await User.findByIdAndUpdate(consumer);
+        const data = await User.findById(consumer);
         const isAlreadyPresent = data.contact.some((item: any) => item.userId == publisher);
         if (!isAlreadyPresent) {
             data.contact.push({ userId: publisher });
@@ -88,6 +88,7 @@ export const UpdatelastMessage2 = async (body: any) => {
             contact.mediaDuration = body.mediaDuration;
             await data.save();
         }
+
     }
     catch (err: any) {
         return err;

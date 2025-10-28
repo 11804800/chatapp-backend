@@ -19,7 +19,7 @@ import { PostMessage } from './utils/PostMessage';
 
 
 const corsWithOptions = {
-    origin: "http://localhost:5173",
+    origin: "https://chatapp-frontend-7c7g.vercel.app",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH'],
     credentials: true,
 }
@@ -29,7 +29,7 @@ const app: any = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "https://chatapp-frontend-7c7g.vercel.app",
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH'],
         credentials: true,
     }
@@ -64,14 +64,14 @@ io.on("connection", (socket: any) => {
         const message = await PostMessage(data);
         if (isUserPresentInContact) {
             io.to(user?.socket_id).emit("new-message", { data: message });
-            UpdateContact(data);
+            await UpdateContact(data);
         }
         else {
             await AddContact({ consumer: data.consumer, publisher: data.publisher });
             io.to(user?.socket_id).emit("new-message", { data: data });
         }
-        UpdatelastMessage(data);
-        UpdatelastMessage2(data);
+        await UpdatelastMessage(data);
+        await UpdatelastMessage2(data);
         socket.emit("message-sent", { data: message });
     });
 
@@ -90,14 +90,14 @@ io.on("connection", (socket: any) => {
             await AddContact({ consumer: data.consumer, publisher: data.data.publisher });
             io.to(user?.socket_id).emit("new-message", { data: data.data });
         }
-        UpdatelastMessage({
+        await UpdatelastMessage({
             mediaType: data.data.mediaType,
             message: data.data.message,
             mediaDuration: data.data.mediaDuration,
             publisher: data.data.publisher,
             consumer: data.data.consumer
         });
-        UpdatelastMessage2({
+        await UpdatelastMessage2({
             mediaType: data.data.mediaType,
             message: data.data.message,
             mediaDuration: data.data.mediaDuration,
@@ -111,20 +111,20 @@ io.on("connection", (socket: any) => {
         const isUserPresentInContact = await GetContact({ consumer: data.data.consumer, publisher: data.publisher });
         if (isUserPresentInContact) {
             io.to(user?.socket_id).emit("new-message", { data: data.data });
-            UpdateContact(data);
+            await UpdateContact(data);
         }
         else {
             await AddContact({ consumer: data.consumer, publisher: data.data.publisher });
             io.to(user?.socket_id).emit("new-message", { data: data.data });
         }
-        UpdatelastMessage({
+        await UpdatelastMessage({
             mediaType: data.data.mediaType,
             message: data.data.mediaType == "audio" ? "audio" : data.data.media,
             mediaDuration: data.data?.mediaDuration,
             publisher: data.data.publisher,
             consumer: data.data.consumer
         });
-        UpdatelastMessage2({
+        await UpdatelastMessage2({
             mediaType: data.data.mediaType,
             message: data.data.mediaType == "audio" ? "audio" : data.data.media,
             mediaDuration: data.data?.mediaDuration,
@@ -136,20 +136,24 @@ io.on("connection", (socket: any) => {
     socket.on("reaction", async (data: any) => {
         const { messageId, consumer, reaction, publisher } = data;
         const MessageData: any = await UpdateMessage({ messageId, reaction });
-        console.log(MessageData);
-        UpdatelastMessage({
+        await UpdatelastMessage({
             message: "Reacted to message",
             publisher: publisher,
             consumer: consumer
         });
-        UpdatelastMessage2({
+        await UpdatelastMessage2({
+            message: "Reacted to message",
+            publisher: publisher,
+            consumer: consumer
+        });
+        await UpdateContact({
             message: "Reacted to message",
             publisher: publisher,
             consumer: consumer
         });
         const user = await GetUserSocketID(consumer);
-        io.to(user?.socket_id).emit("new-message", { data: MessageData });
-        UpdateContact(data);
+        io.to(user?.socket_id).emit("new-reaction-message", { data: MessageData });
+
     });
 
     socket.on("message-seen", async (data: any) => {
