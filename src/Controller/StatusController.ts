@@ -3,6 +3,7 @@ import Status from "../Model/Status";
 import User from "../Model/User";
 
 
+
 export const GetStatus = async (req: any, res: Response) => {
     try {
         const data = await User.findById(req.user?._id).populate({
@@ -34,7 +35,8 @@ export const PostStatus = async (req: any, res: Response) => {
             text: req.body.text,
             file: `status/${req.file?.filename}`,
             link: req.body.link,
-            user: req.user?._id
+            user: req.user?._id,
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000)
         });
         await User.findByIdAndUpdate(req.user?._id, { $push: { status: data._id } });
         res.status(200).json({ data: data });
@@ -42,6 +44,7 @@ export const PostStatus = async (req: any, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 }
+
 export const DeleteStatus = async (req: Request, res: Response) => {
     try {
         const data = await Status.findByIdAndDelete({ _id: req.params.id })

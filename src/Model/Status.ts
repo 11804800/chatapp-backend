@@ -6,7 +6,8 @@ interface Status {
     link: string,
     mediaType: string,
     user: string,
-    seen: any[]
+    seen: any[],
+    expires: object
 }
 
 const StatusSchema = new Schema<Status>({
@@ -26,6 +27,7 @@ const StatusSchema = new Schema<Status>({
     link: {
         type: String
     },
+    expires: { type: Date, expires: '2m' },
     seen: [{ type: mongoose.Schema.Types.ObjectId, ref: "user" }]
 }, {
     timestamps: true
