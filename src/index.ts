@@ -235,9 +235,12 @@ app.use("/api/users", UserRouter);
 app.use("/api/status", StatusRouter);
 app.use("/api/messages", MessageRouter);
 
-app.get("/", (req: Request, res: Response) => {
-    res.render('index')
-})
+app.get("/", (req, res) => {
+    res.send("<h1>Welcome to Express</h1>")
+});
+app.get("/health", (req, res) => {
+    res.status(200).json({ status: "ok" });
+});
 
 
 server.listen(port, () => {
