@@ -17,21 +17,44 @@ import { PostMessage } from './utils/PostMessage';
 
 
 
+const allowedOrigins = [
+    'https://chatapp-frontend-7c7g.vercel.app'
+];
 
 const corsWithOptions = {
-    origin: "https://chatapp-frontend-7c7g.vercel.app",
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH'],
+    origin: function (origin: any, callback: any) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
-}
+    optionsSuccessStatus: 200
+};
+
+
 
 
 const app: any = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "https://chatapp-frontend-7c7g.vercel.app",
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'HEAD', 'PATCH'],
+        origin: function (origin, callback) {
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.indexOf(origin) !== -1) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
+        optionsSuccessStatus: 200
     }
 });
 
