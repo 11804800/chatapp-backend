@@ -1,5 +1,18 @@
 {
   "compilerOptions": {
+    "types": [
+      "node",
+      "express",
+      "multer",
+      "passport",
+      "passport-jwt",
+      "passport-local",
+      "passport-local-mongoose",
+      "socket.io",
+      "uuid",
+      "webidl-conversions",
+      "whatwg-url"
+    ],
     "target": "ES6",
     "module": "CommonJS",
     "outDir": "./dist",

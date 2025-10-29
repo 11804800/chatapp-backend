@@ -235,10 +235,10 @@ app.use("/api/users", UserRouter);
 app.use("/api/status", StatusRouter);
 app.use("/api/messages", MessageRouter);
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
     res.send("<h1>Welcome to Express</h1>")
 });
-app.get("/health", (req, res) => {
+app.get("/health", (req: Request, res: Response) => {
     res.status(200).json({ status: "ok" });
 });
 
