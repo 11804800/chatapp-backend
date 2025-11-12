@@ -18,7 +18,8 @@ import { PostMessage } from './utils/PostMessage';
 
 
 const allowedOrigins = [
-    'https://chatapp-frontend-7c7g.vercel.app'
+    'https://chatapp-frontend-7c7g.vercel.app',
+    "http://localhost:5173"
 ];
 
 const corsWithOptions = {
